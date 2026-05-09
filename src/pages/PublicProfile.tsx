@@ -1,0 +1,13 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../App';
+import { getPublicProfile } from '../lib/profiles';
+import { listMyDocuments } from '../lib/documents';
+import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
+import { QRCodeCard } from '../components/sharing/QRCodeCard';
+import { publicProfileUrl } from '../utils/qr';
+import { verificationLabel } from '../services/verificationService';
+import type { PublicProfilePayload } from '../types/sharing';
+
+export default function PublicProfile({ own=false }: { own?: boolean }){const{publicId}=useParams();const{profile}=useAuth();const[data,setData]=useState<PublicProfilePayload|null>(null);useEffect(()=>{async function load(){if(own&&profile){const docs=await listMyDocuments({visibility:'public'});setData({profile,examStatus:profile.profile_status==='verified'?'verified':profile.profile_status==='exam_submitted'?'exam_submitted':profile.profile_status==='rejected'?'rejected':'exam_missing',documents:docs.filter(d=>d.verification_status!=='rejected')});}else if(publicId){setData(await getPublicProfile(publicId) as PublicProfilePayload)}}load();},[own,profile,publicId]);if(!data)return <Card>QualiPass wird geladen…</Card>;const name=[data.profile.first_name,data.profile.last_name].filter(Boolean).join(' ');return <div className="grid gap-6 lg:grid-cols-[1fr_320px]"><Card><p className="text-sm font-semibold text-care-700">Öffentlicher QualiPass</p><h1 className="mt-2 text-3xl font-bold">{name}</h1><p className="text-slate-600">{data.profile.job_title}</p><div className="mt-4 flex flex-wrap gap-2">{data.profile.specialties?.map(s=><Badge key={s} tone="blue">{s}</Badge>)}</div><div className="mt-5"><Badge tone={data.examStatus==='verified'?'green':'amber'}>{data.examStatus==='verified'?'Examen verifiziert':'Examen noch nicht verifiziert'}</Badge></div><p className="mt-4 text-sm text-slate-600">Nachweise sind klar als „Selbst angegeben“, „Zur Prüfung eingereicht“ oder „Geprüft“ gekennzeichnet. Private Dokumente und interne Kommentare werden nicht öffentlich angezeigt.</p><div className="mt-6 space-y-3">{data.documents.map(doc=><div key={doc.id} className="rounded-2xl border p-4"><div className="flex justify-between gap-3"><div><p className="font-semibold">{doc.title}</p><p className="text-sm text-slate-600">{doc.document_type}</p></div><Badge tone={doc.verification_status==='verified'?'green':doc.verification_status==='submitted'?'amber':'slate'}>{verificationLabel(doc.verification_status)}</Badge></div></div>)}</div></Card><QRCodeCard value={publicProfileUrl(data.profile.public_id)}/></div>}

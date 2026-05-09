@@ -1,0 +1,6 @@
+import { useEffect, useState } from 'react';
+import { listVerificationQueue, verifyDocument } from '../lib/admin';
+import { VerificationQueue } from '../components/admin/VerificationQueue';
+import { Card } from '../components/ui/Card';
+
+export default function AdminVerification(){const[queue,setQueue]=useState<{examDocuments:Record<string,unknown>[];documents:Record<string,unknown>[]}>({examDocuments:[],documents:[]});const load=()=>listVerificationQueue().then((data)=>setQueue({examDocuments:data.examDocuments??[],documents:data.documents??[]}));useEffect(load,[]);async function onVerify(kind:'exam'|'document',id:string,status:'verified'|'rejected'){await verifyDocument(kind,id,status,`Prüfung: ${status}`);await load();}return <div className="space-y-5"><Card><h1 className="text-2xl font-bold">Prüfungsansicht</h1><p className="text-slate-600">Jede Statusänderung wird per Datenbank-Trigger im Prüfprotokoll gespeichert.</p></Card><h2 className="text-xl font-bold">Examen</h2><VerificationQueue rows={queue.examDocuments} kind="exam" onVerify={onVerify}/><h2 className="text-xl font-bold">Nachweise</h2><VerificationQueue rows={queue.documents} kind="document" onVerify={onVerify}/></div>}
