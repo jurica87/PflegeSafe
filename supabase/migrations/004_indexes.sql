@@ -1,0 +1,12 @@
+create index if not exists idx_documents_user_id on public.documents(user_id);
+create index if not exists idx_documents_expiry_date on public.documents(expiry_date);
+create index if not exists idx_documents_document_type on public.documents(document_type);
+create index if not exists idx_documents_verification_status on public.documents(verification_status);
+create index if not exists idx_documents_visibility on public.documents(visibility);
+create index if not exists idx_profiles_public_id on public.profiles(public_id);
+create index if not exists idx_profiles_profile_status on public.profiles(profile_status);
+create index if not exists idx_exam_documents_user_id on public.exam_documents(user_id);
+create index if not exists idx_exam_documents_verification_status on public.exam_documents(verification_status);
+create index if not exists idx_share_links_token on public.share_links(token);
+create index if not exists idx_document_tags_user_tag on public.document_tags(user_id, tag);
+create index if not exists idx_audit_logs_user_created on public.audit_logs(user_id, created_at desc);

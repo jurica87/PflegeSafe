@@ -1,0 +1,2 @@
+import { Card } from '../components/ui/Card';
+export default function Privacy(){return <Card><h1 className="text-2xl font-bold">Datenschutzerklärung</h1><p className="mt-2 text-slate-600">Platzhalter. PflegeSafe ist auf Selbsthosting, Datensparsamkeit, private Storage-Buckets, RLS, Auditierbarkeit, Export und Löschung ausgelegt. Keine externen Analytics, Fonts, Tracker oder produktiven CDN-Abhängigkeiten.</p></Card>}
